@@ -7,7 +7,7 @@ module StatHat
                         args = { :key => stat_key,
                                 :ukey => user_key,
                                 :value => value }
-                        resp = Net::HTTP.post_form(URI.parse("http://stathat.com/api/v"), args)
+                        resp = Net::HTTP.post_form(URI.parse("http://api.stathat.com/v"), args)
                         return self.response_valid?(resp)
                 end
 
@@ -15,7 +15,7 @@ module StatHat
                         args = { :key => stat_key,
                                 :ukey => user_key,
                                 :value => value }
-                        resp = Net::HTTP.post_form(URI.parse("http://stathat.com/api/c"), args)
+                        resp = Net::HTTP.post_form(URI.parse("http://api.stathat.com/c"), args)
                         return self.response_valid?(resp)
                 end
 
@@ -23,7 +23,7 @@ module StatHat
                         args = { :stat => stat_name, 
                                 :email => account_email, 
                                 :value => value }
-                        resp = Net::HTTP.post_form(URI.parse("http://stathat.com/api/ez"), args)
+                        resp = Net::HTTP.post_form(URI.parse("http://api.stathat.com/ez"), args)
                         return self.response_valid?(resp)
                 end
 
@@ -31,7 +31,7 @@ module StatHat
                         args = { :stat => stat_name, 
                                 :email => account_email, 
                                 :count => count }
-                        resp = Net::HTTP.post_form(URI.parse("http://stathat.com/api/ez"), args)
+                        resp = Net::HTTP.post_form(URI.parse("http://api.stathat.com/ez"), args)
                         return self.response_valid?(resp)
                 end
 
