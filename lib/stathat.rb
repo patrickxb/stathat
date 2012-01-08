@@ -14,7 +14,7 @@ module StatHat
                 def self.post_count(stat_key, user_key, count)
                         args = { :key => stat_key,
                                 :ukey => user_key,
-                                :value => value }
+                                :value => count }
                         resp = Net::HTTP.post_form(URI.parse("http://api.stathat.com/c"), args)
                         return self.response_valid?(resp)
                 end
