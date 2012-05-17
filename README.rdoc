@@ -3,7 +3,7 @@
 Description goes here.
 
 == Contributing to stathat
- 
+
 * Check out the latest master to make sure the feature hasn't been implemented or the bug hasn't been fixed yet
 * Check out the issue tracker to make sure someone already hasn't requested it and/or contributed it
 * Fork the project
@@ -14,6 +14,5 @@ Description goes here.
 
 == Copyright
 
-Copyright (c) 2011 Patrick Crosby. See LICENSE.txt for
-further details.
+Copyright (c) 2011-2012 Numerotron Inc. See LICENSE.txt for further details.
 
