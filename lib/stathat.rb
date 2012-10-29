@@ -18,7 +18,7 @@ module StatHat
                 def self.post_count(stat_key, user_key, count)
                         args = { :key => stat_key,
                                 :ukey => user_key,
-                                :value => count }
+                                :count => count }
                         return self.send_to_stathat(CLASSIC_COUNT_URL, args)
                 end
 
