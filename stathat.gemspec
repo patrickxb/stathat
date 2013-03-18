@@ -5,13 +5,13 @@
 
 Gem::Specification.new do |s|
   s.name = %q{stathat}
-  s.version = "0.0.4"
+  s.version = "0.0.5"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
-  s.authors = ["Patrick Crosby"]
-  s.date = %q{2012-05-17}
+  s.authors = [%q{Patrick Crosby}]
+  s.date = %q{2012-10-29}
   s.description = %q{Easily post stats to your StatHat account using this gem.  Encapsulates full API.}
-  s.email = %q{patrick@xblabs.com}
+  s.email = %q{patrick@stathat.com}
   s.extra_rdoc_files = [
     "LICENSE.txt",
     "README.rdoc"
@@ -30,9 +30,9 @@ Gem::Specification.new do |s|
     "test/test_stathat.rb"
   ]
   s.homepage = %q{http://github.com/patrickxb/stathat}
-  s.licenses = ["MIT"]
-  s.require_paths = ["lib"]
-  s.rubygems_version = %q{1.5.0}
+  s.licenses = [%q{MIT}]
+  s.require_paths = [%q{lib}]
+  s.rubygems_version = %q{1.8.6}
   s.summary = %q{gem to access StatHat api}
   s.test_files = [
     "test/helper.rb",

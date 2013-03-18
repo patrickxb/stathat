@@ -8,31 +8,35 @@ module StatHat
                 CLASSIC_COUNT_URL = "http://api.stathat.com/c"
                 EZ_URL = "http://api.stathat.com/ez"
 
-                def self.post_value(stat_key, user_key, value)
+                def self.post_value(stat_key, user_key, value, timestamp=nil)
                         args = { :key => stat_key,
                                 :ukey => user_key,
                                 :value => value }
+                        args[:t] = timestamp unless timestamp.nil?
                         return self.send_to_stathat(CLASSIC_VALUE_URL, args)
                 end
 
-                def self.post_count(stat_key, user_key, count)
+                def self.post_count(stat_key, user_key, count, timestamp=nil)
                         args = { :key => stat_key,
                                 :ukey => user_key,
                                 :count => count }
+                        args[:t] = timestamp unless timestamp.nil?
                         return self.send_to_stathat(CLASSIC_COUNT_URL, args)
                 end
 
-                def self.ez_post_value(stat_name, ezkey, value)
+                def self.ez_post_value(stat_name, ezkey, value, timestamp=nil)
                         args = { :stat => stat_name,
                                 :ezkey => ezkey,
                                 :value => value }
+                        args[:t] = timestamp unless timestamp.nil?
                         return self.send_to_stathat(EZ_URL, args)
                 end
 
-                def self.ez_post_count(stat_name, ezkey, count)
+                def self.ez_post_count(stat_name, ezkey, count, timestamp=nil)
                         args = { :stat => stat_name,
                                 :ezkey => ezkey,
                                 :count => count }
+                        args[:t] = timestamp unless timestamp.nil?
                         return self.send_to_stathat(EZ_URL, args)
                 end
 

@@ -17,7 +17,7 @@ Jeweler::Tasks.new do |gem|
   gem.license = "MIT"
   gem.summary = %Q{gem to access StatHat api}
   gem.description = %Q{Easily post stats to your StatHat account using this gem.  Encapsulates full API.}
-  gem.email = "patrick@xblabs.com"
+  gem.email = "patrick@stathat.com"
   gem.authors = ["Patrick Crosby"]
   # Include your dependencies below. Runtime dependencies are required when using your gem,
   # and development dependencies are only needed for development (ie running rake tasks, tests, etc)
