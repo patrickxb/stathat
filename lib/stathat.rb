@@ -60,7 +60,6 @@ module StatHat
                 end
 
                 def ez_post_value(stat_name, ezkey, value, timestamp, cb)
-                        puts "ezval cb: #{cb}"
                         args = { :stat => stat_name,
                                 :ezkey => ezkey,
                                 :value => value }
@@ -82,12 +81,10 @@ module StatHat
                         @pool = []
                         5.times do |i|
                                 @pool[i] = Thread.new do
-                                        puts "thread #{i} started"
                                         while true do
                                                 point = @que.pop
                                                 # XXX check for error?
                                                 begin
-                                                        puts "thread #{i}: sending"
                                                         resp = send_to_stathat(point[:url], point[:args])
                                                         if point[:cb]
                                                                 point[:cb].call(resp)
@@ -99,7 +96,6 @@ module StatHat
                                                         break unless @running
                                                 }
                                         end
-                                        puts "reporter thread #{i} finished"
                                 end
                         end
                 end
