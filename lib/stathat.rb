@@ -7,20 +7,20 @@ require 'singleton'
 module StatHat
         class API
                 class << self
-                        def ez_post_value(stat_name, ezkey, value, &block)
-                                Reporter.instance.ez_post_value(stat_name, ezkey, value, block)
+                        def ez_post_value(stat_name, ezkey, value, timestamp=nil, &block)
+                                Reporter.instance.ez_post_value(stat_name, ezkey, value, timestamp, block)
                         end
 
-                        def ez_post_count(stat_name, ezkey, count, &block)
-                                Reporter.instance.ez_post_count(stat_name, ezkey, count, block)
+                        def ez_post_count(stat_name, ezkey, count, timestamp=nil, &block)
+                                Reporter.instance.ez_post_count(stat_name, ezkey, count, timestamp, block)
                         end
 
-                        def post_count(stat_key, user_key, count, &block)
-                                Reporter.instance.post_count(stat_key, user_key, count, block)
+                        def post_count(stat_key, user_key, count, timestamp=nil, &block)
+                                Reporter.instance.post_count(stat_key, user_key, count, timestamp, block)
                         end
 
-                        def post_value(stat_key, user_key, value, &block)
-                                Reporter.instance.post_value(stat_key, user_key, value, block)
+                        def post_value(stat_key, user_key, value, timestamp=nil, &block)
+                                Reporter.instance.post_value(stat_key, user_key, value, timestamp, block)
                         end
                 end
         end
@@ -31,7 +31,6 @@ module StatHat
                 CLASSIC_VALUE_URL = "http://api.stathat.com/v"
                 CLASSIC_COUNT_URL = "http://api.stathat.com/c"
                 EZ_URL = "http://api.stathat.com/ez"
-
 
                 def initialize
                         @que = Queue.new
@@ -44,32 +43,36 @@ module StatHat
                         # XXX serialize queue?
                 end
 
-                def post_value(stat_key, user_key, value, cb)
+                def post_value(stat_key, user_key, value, timestamp, cb)
                         args = { :key => stat_key,
                                 :ukey => user_key,
                                 :value => value }
+                        args[:t] = timestamp unless timestamp.nil?
                         enqueue(CLASSIC_VALUE_URL, args, cb)
                 end
 
-                def post_count(stat_key, user_key, count, cb)
+                def post_count(stat_key, user_key, count, timestamp, cb)
                         args = { :key => stat_key,
                                 :ukey => user_key,
                                 :count => count }
+                        args[:t] = timestamp unless timestamp.nil?
                         enqueue(CLASSIC_COUNT_URL, args, cb)
                 end
 
-                def ez_post_value(stat_name, ezkey, value, cb)
+                def ez_post_value(stat_name, ezkey, value, timestamp, cb)
                         puts "ezval cb: #{cb}"
                         args = { :stat => stat_name,
                                 :ezkey => ezkey,
                                 :value => value }
+                        args[:t] = timestamp unless timestamp.nil?
                         enqueue(EZ_URL, args, cb)
                 end
 
-                def ez_post_count(stat_name, ezkey, count, cb)
+                def ez_post_count(stat_name, ezkey, count, timestamp, cb)
                         args = { :stat => stat_name,
                                 :ezkey => ezkey,
                                 :count => count }
+                        args[:t] = timestamp unless timestamp.nil?
                         enqueue(EZ_URL, args, cb)
                 end
 
