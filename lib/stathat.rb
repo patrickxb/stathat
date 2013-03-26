@@ -124,7 +124,7 @@ module StatHat
                           uri.query = URI.encode_www_form(args)                          
                         rescue NoMethodError => e
                           # backwards compatability for pre 1.9.x
-                          uri.query = args.map { |arg, val| arg.to_s + "=" + CGI::encode(val.to_s) }.join('&')
+                          uri.query = args.map { |arg, val| arg.to_s + "=" + CGI::escape(val.to_s) }.join('&')
                         end
                         
                         resp = Net::HTTP.get(uri)
