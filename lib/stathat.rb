@@ -1,4 +1,5 @@
 require 'net/http'
+require 'cgi'
 require 'uri'
 require 'json'
 require 'thread'
@@ -118,7 +119,14 @@ module StatHat
 
                 def send_to_stathat(url, args)
                         uri = URI.parse(url)
-                        uri.query = URI.encode_www_form(args)
+
+                        begin
+                          uri.query = URI.encode_www_form(args)                          
+                        rescue NoMethodError => e
+                          # backwards compatability for pre 1.9.x
+                          uri.query = args.map { |arg, val| arg.to_s + "=" + CGI::escape(val.to_s) }.join('&')
+                        end
+                        
                         resp = Net::HTTP.get(uri)
                         return Response.new(resp)
                 end
