@@ -5,6 +5,57 @@ require 'thread'
 require 'singleton'
 
 module StatHat
+        class Common
+                CLASSIC_VALUE_URL = "http://api.stathat.com/v"
+                CLASSIC_COUNT_URL = "http://api.stathat.com/c"
+                EZ_URL = "http://api.stathat.com/ez"
+
+                class << self
+                        def send_to_stathat(url, args)
+                                uri = URI.parse(url)
+                                uri.query = URI.encode_www_form(args)
+                                resp = Net::HTTP.get(uri)
+                                return Response.new(resp)
+                        end
+                end
+        end
+
+        class SyncAPI
+                class << self
+                        def ez_post_value(stat_name, ezkey, value, timestamp=nil)
+                                args = { :stat => stat_name,
+                                        :ezkey => ezkey,
+                                        :value => value }
+                                args[:t] = timestamp unless timestamp.nil?
+                                Common::send_to_stathat(Common::EZ_URL, args)
+                        end
+
+                        def ez_post_count(stat_name, ezkey, count, timestamp=nil)
+                                args = { :stat => stat_name,
+                                        :ezkey => ezkey,
+                                        :count => count }
+                                args[:t] = timestamp unless timestamp.nil?
+                                Common::send_to_stathat(Common::EZ_URL, args)
+                        end
+
+                        def post_count(stat_key, user_key, count, timestamp=nil)
+                                args = { :key => stat_key,
+                                        :ukey => user_key,
+                                        :count => count }
+                                args[:t] = timestamp unless timestamp.nil?
+                                Common::send_to_stathat(Common::CLASSIC_COUNT_URL, args)
+                        end
+
+                        def post_value(stat_key, user_key, value, timestamp=nil)
+                                args = { :key => stat_key,
+                                        :ukey => user_key,
+                                        :value => value }
+                                args[:t] = timestamp unless timestamp.nil?
+                                Common::send_to_stathat(Common::CLASSIC_VALUE_URL, args)
+                        end
+                end
+        end
+
         class API
                 class << self
                         def ez_post_value(stat_name, ezkey, value, timestamp=nil, &block)
@@ -28,10 +79,6 @@ module StatHat
         class Reporter
                 include Singleton
 
-                CLASSIC_VALUE_URL = "http://api.stathat.com/v"
-                CLASSIC_COUNT_URL = "http://api.stathat.com/c"
-                EZ_URL = "http://api.stathat.com/ez"
-
                 def initialize
                         @que = Queue.new
                         @runlock = Mutex.new
@@ -48,7 +95,7 @@ module StatHat
                                 :ukey => user_key,
                                 :value => value }
                         args[:t] = timestamp unless timestamp.nil?
-                        enqueue(CLASSIC_VALUE_URL, args, cb)
+                        enqueue(Common::CLASSIC_VALUE_URL, args, cb)
                 end
 
                 def post_count(stat_key, user_key, count, timestamp, cb)
@@ -56,7 +103,7 @@ module StatHat
                                 :ukey => user_key,
                                 :count => count }
                         args[:t] = timestamp unless timestamp.nil?
-                        enqueue(CLASSIC_COUNT_URL, args, cb)
+                        enqueue(Common::CLASSIC_COUNT_URL, args, cb)
                 end
 
                 def ez_post_value(stat_name, ezkey, value, timestamp, cb)
@@ -64,7 +111,7 @@ module StatHat
                                 :ezkey => ezkey,
                                 :value => value }
                         args[:t] = timestamp unless timestamp.nil?
-                        enqueue(EZ_URL, args, cb)
+                        enqueue(Common::EZ_URL, args, cb)
                 end
 
                 def ez_post_count(stat_name, ezkey, count, timestamp, cb)
@@ -72,7 +119,7 @@ module StatHat
                                 :ezkey => ezkey,
                                 :count => count }
                         args[:t] = timestamp unless timestamp.nil?
-                        enqueue(EZ_URL, args, cb)
+                        enqueue(Common::EZ_URL, args, cb)
                 end
 
                 private
@@ -85,7 +132,7 @@ module StatHat
                                                 point = @que.pop
                                                 # XXX check for error?
                                                 begin
-                                                        resp = send_to_stathat(point[:url], point[:args])
+                                                        resp = Common::send_to_stathat(point[:url], point[:args])
                                                         if point[:cb]
                                                                 point[:cb].call(resp)
                                                         end
@@ -114,13 +161,6 @@ module StatHat
                         point = {:url => url, :args => args, :cb => cb}
                         @que << point
                         true
-                end
-
-                def send_to_stathat(url, args)
-                        uri = URI.parse(url)
-                        uri.query = URI.encode_www_form(args)
-                        resp = Net::HTTP.get(uri)
-                        return Response.new(resp)
                 end
         end
 

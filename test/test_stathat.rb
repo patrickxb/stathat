@@ -38,4 +38,32 @@ class TestStathat < MiniTest::Unit::TestCase
                 end
                 sleep(1)
         end
+
+        def test_ez_value_sync
+                resp = StatHat::SyncAPI.ez_post_value("test ez value stat", "test@stathat.com", 0.92)
+                assert(resp.valid?, "response was invalid")
+                assert_equal(resp.msg, "ok", "message should be 'ok'")
+                assert_equal(resp.status, 200, "status should be 200")
+        end
+
+        def test_ez_count_sync
+                resp = StatHat::SyncAPI.ez_post_value("test ez count stat", "test@stathat.com", 12)
+                assert(resp.valid?, "response was invalid")
+                assert_equal(resp.msg, "ok", "message should be 'ok'")
+                assert_equal(resp.status, 200, "status should be 200")
+        end
+
+        def test_classic_count_bad_keys_sync
+                r = StatHat::SyncAPI.post_count("XXXXXXXX", "YYYYYYYY", 12)
+                assert_equal(r.valid?, false, "response was valid")
+                assert_equal(r.msg, "invalid keys", "incorrect error message")
+                assert_equal(r.status, 500, "incorrect status code")
+        end
+
+        def test_classic_value_bad_keys_sync
+                r = StatHat::SyncAPI.post_value("ZZZZZZZZ", "YYYYYYYYY", 0.92)
+                assert_equal(r.valid?, false, "response was valid")
+                assert_equal(r.msg, "invalid keys", "incorrect error message")
+                assert_equal(r.status, 500, "incorrect status code")
+        end
 end
