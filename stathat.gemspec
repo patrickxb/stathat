@@ -2,7 +2,7 @@
 
 Gem::Specification.new do |s|
   s.name = %q{stathat}
-  s.version = "0.1.6"
+  s.version = "0.1.7"
   s.authors = ["StatHat"]
   s.description = %q{Easily post stats to your StatHat account using this gem.  Encapsulates full API.}
   s.email = %q{info@stathat.com}
