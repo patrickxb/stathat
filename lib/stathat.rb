@@ -12,13 +12,6 @@ module StatHat
                 EZ_URL = "https://api.stathat.com/ez"
 
                 class << self
-                       # def send_to_stathat(url, args)
-                       #         uri = URI.parse(url)
-                       #         uri.query = URI.encode_www_form(args)
-                       #         resp = Net::HTTP.get(uri)
-                       #         return Response.new(resp)
-                       # end
-
                         def send_to_stathat(url, args)
                                 uri = URI.parse(url)
 
