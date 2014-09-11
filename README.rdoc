@@ -1,6 +1,6 @@
 = stathat
 
-Description goes here.
+Ruby library for stathat
 
 == Contributing to stathat
 
