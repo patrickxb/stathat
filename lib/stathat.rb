@@ -7,18 +7,11 @@ require 'singleton'
 
 module StatHat
         class Common
-                CLASSIC_VALUE_URL = "http://api.stathat.com/v"
-                CLASSIC_COUNT_URL = "http://api.stathat.com/c"
-                EZ_URL = "http://api.stathat.com/ez"
+                CLASSIC_VALUE_URL = "https://api.stathat.com/v"
+                CLASSIC_COUNT_URL = "https://api.stathat.com/c"
+                EZ_URL = "https://api.stathat.com/ez"
 
                 class << self
-                       # def send_to_stathat(url, args)
-                       #         uri = URI.parse(url)
-                       #         uri.query = URI.encode_www_form(args)
-                       #         resp = Net::HTTP.get(uri)
-                       #         return Response.new(resp)
-                       # end
-
                         def send_to_stathat(url, args)
                                 uri = URI.parse(url)
 
