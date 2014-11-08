@@ -66,4 +66,18 @@ class TestStathat < MiniTest::Unit::TestCase
                 assert_equal(r.msg, "invalid keys", "incorrect error message")
                 assert_equal(r.status, 500, "incorrect status code")
         end
+
+        def test_stat_on_finished_queue
+                reporter = StatHat::Reporter.instance
+                reporter.finish
+
+                assert !StatHat::API.ez_post_value("test ez count queued stat", "test@stathat.com", 12)
+        end
+
+        def test_reporter_finish
+                reporter = StatHat::Reporter.instance
+                reporter.finish
+
+                assert !reporter.running?
+        end
 end

@@ -89,13 +89,17 @@ module StatHat
 
                 def initialize
                         @que = Queue.new
-                        @runlock = Mutex.new
+                        @running = false
                         run_pool()
                 end
 
                 def finish()
                         stop_pool
                         # XXX serialize queue?
+                end
+
+                def running?
+                  @running
                 end
 
                 def post_value(stat_key, user_key, value, timestamp, cb)
@@ -132,12 +136,11 @@ module StatHat
 
                 private
                 def run_pool
-                        @runlock.synchronize { @running = true }
+                        @running = true
                         @pool = []
                         5.times do |i|
                                 @pool[i] = Thread.new do
-                                        while true do
-                                                point = @que.pop
+                                        while (point = @que.pop) != :quit
                                                 # XXX check for error?
                                                 begin
                                                         resp = Common::send_to_stathat(point[:url], point[:args])
@@ -147,18 +150,21 @@ module StatHat
                                                 rescue
                                                         pp $!
                                                 end
-                                                @runlock.synchronize {
-                                                        break unless @running
-                                                }
                                         end
                                 end
                         end
                 end
 
                 def stop_pool()
-                        @runlock.synchronize {
-                                @running = false
-                        }
+                        @running = false
+
+                        # Each thread will stop after it receives
+                        # `:quit` instead of a hash of stat
+                        # information. Sending `@pool.length` quit
+                        # messages ensures that all threads will be
+                        # woken up, and thus avoid deadlocks.
+                        @pool.length.times { @que << :quit }
+
                         @pool.each do |th|
                                 th.join if th && th.alive?
                         end
