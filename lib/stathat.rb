@@ -10,6 +10,7 @@ module StatHat
                 CLASSIC_VALUE_URL = "https://api.stathat.com/v"
                 CLASSIC_COUNT_URL = "https://api.stathat.com/c"
                 EZ_URL = "https://api.stathat.com/ez"
+                EZ_URI = URI(EZ_URL)
 
                 class << self
                         def send_to_stathat(url, args)
@@ -24,6 +25,15 @@ module StatHat
 
                                 resp = Net::HTTP.get(uri)
                                 return Response.new(resp)
+                        end
+
+                        def send_ez_batch_to_stathat(batch_args, ezkey)
+                             resp = Net::HTTP.start(EZ_URI.host, EZ_URI.port, :use_ssl => true) do |http|
+                                    http.post EZ_URI.path,
+                                                   { :ezkey => ezkey, :data => batch_args }.to_json,
+                                                   "Content-Type" => "application/json"
+                            end
+                            return Response.new(resp.body)
                         end
                 end
         end
@@ -66,19 +76,23 @@ module StatHat
 
         class API
                 class << self
-                        def ez_post_value(stat_name, ezkey, value, timestamp=nil, &block)
+                        attr_accessor :max_batch
+                        attr_accessor :pool_size
+                        attr_accessor :max_queue_size
+
+                        def ez_post_value(stat_name, ezkey, value, timestamp=Time.now.to_i, &block)
                                 Reporter.instance.ez_post_value(stat_name, ezkey, value, timestamp, block)
                         end
 
-                        def ez_post_count(stat_name, ezkey, count, timestamp=nil, &block)
+                        def ez_post_count(stat_name, ezkey, count, timestamp=Time.now.to_i, &block)
                                 Reporter.instance.ez_post_count(stat_name, ezkey, count, timestamp, block)
                         end
 
-                        def post_count(stat_key, user_key, count, timestamp=nil, &block)
+                        def post_count(stat_key, user_key, count, timestamp=Time.now.to_i, &block)
                                 Reporter.instance.post_count(stat_key, user_key, count, timestamp, block)
                         end
 
-                        def post_value(stat_key, user_key, value, timestamp=nil, &block)
+                        def post_value(stat_key, user_key, value, timestamp=Time.now.to_i, &block)
                                 Reporter.instance.post_value(stat_key, user_key, value, timestamp, block)
                         end
                 end
@@ -134,19 +148,48 @@ module StatHat
                 def run_pool
                         @runlock.synchronize { @running = true }
                         @pool = []
-                        5.times do |i|
+                        (API.pool_size || 5).times do |i|
                                 @pool[i] = Thread.new do
                                         while true do
-                                                point = @que.pop
-                                                # XXX check for error?
-                                                begin
-                                                        resp = Common::send_to_stathat(point[:url], point[:args])
-                                                        if point[:cb]
-                                                                point[:cb].call(resp)
-                                                        end
-                                                rescue
-                                                        pp $!
+                                                points = [@que.pop]
+                                                puts "Dropping StatHat queue" if API.max_queue_size && @que.length > API.max_queue_size
+
+                                                while points.size < (API.max_batch || 10) && @que.length > 0
+                                                    points << @que.pop(true) rescue ThreadError
                                                 end
+
+                                                groups = points.group_by{|point| point[:args][:ezkey]}
+                                                groups.each do |ezkey, batch|
+                                                    if ezkey.nil?
+                                                        batch.each do |point|
+                                                            # XXX check for error?
+                                                            begin
+                                                                    resp = Common::send_to_stathat(point[:url], point[:args])
+                                                                    if point[:cb]
+                                                                            point[:cb].call(resp)
+                                                                    end
+                                                            rescue
+                                                                    p $!
+                                                            end
+                                                        end
+
+                                                    else
+                                                        batch_args = batch.map{|point| point[:args]}
+                                                        batch_args.each{|args| args.delete(:ezkey)}
+
+                                                        begin
+                                                                resp = Common::send_ez_batch_to_stathat(batch_args, ezkey)
+                                                                batch.each do |point|
+                                                                    if point[:cb]
+                                                                            point[:cb].call(resp)
+                                                                    end
+                                                                end
+                                                        rescue
+                                                                p $!
+                                                        end
+                                                    end
+                                                end
+
                                                 @runlock.synchronize {
                                                         break unless @running
                                                 }
