@@ -79,6 +79,7 @@ module StatHat
                         attr_accessor :max_batch
                         attr_accessor :pool_size
                         attr_accessor :max_queue_size
+                        attr_accessor :batch_sleep_seconds
 
                         def ez_post_value(stat_name, ezkey, value, timestamp=Time.now.to_i, &block)
                                 Reporter.instance.ez_post_value(stat_name, ezkey, value, timestamp, block)
@@ -152,9 +153,7 @@ module StatHat
                                 @pool[i] = Thread.new do
                                         while true do
                                                 points = [@que.pop]
-                                                puts "Dropping StatHat queue" if API.max_queue_size && @que.length > API.max_queue_size
-
-                                                while points.size < (API.max_batch || 10) && @que.length > 0
+                                                while points.size < (API.max_batch || 1) && @que.length > 0
                                                     points << @que.pop(true) rescue ThreadError
                                                 end
 
@@ -193,6 +192,8 @@ module StatHat
                                                 @runlock.synchronize {
                                                         break unless @running
                                                 }
+
+                                                sleep API.batch_sleep_seconds unless API.batch_sleep_seconds.nil?
                                         end
                                 end
                         end
@@ -209,6 +210,10 @@ module StatHat
 
                 def enqueue(url, args, cb=nil)
                         return false unless @running
+                        if API.max_queue_size && @que.length > API.max_queue_size
+                                puts "Dropping StatHat queue"
+                                @que.clear
+                        end
                         point = {:url => url, :args => args, :cb => cb}
                         @que << point
                         true
