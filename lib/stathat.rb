@@ -81,19 +81,19 @@ module StatHat
                         attr_accessor :max_queue_size
                         attr_accessor :batch_sleep_seconds
 
-                        def ez_post_value(stat_name, ezkey, value, timestamp=Time.now.to_i, &block)
+                        def ez_post_value(stat_name, ezkey, value, timestamp=nil, &block)
                                 Reporter.instance.ez_post_value(stat_name, ezkey, value, timestamp, block)
                         end
 
-                        def ez_post_count(stat_name, ezkey, count, timestamp=Time.now.to_i, &block)
+                        def ez_post_count(stat_name, ezkey, count, timestamp=nil, &block)
                                 Reporter.instance.ez_post_count(stat_name, ezkey, count, timestamp, block)
                         end
 
-                        def post_count(stat_key, user_key, count, timestamp=Time.now.to_i, &block)
+                        def post_count(stat_key, user_key, count, timestamp=nil, &block)
                                 Reporter.instance.post_count(stat_key, user_key, count, timestamp, block)
                         end
 
-                        def post_value(stat_key, user_key, value, timestamp=Time.now.to_i, &block)
+                        def post_value(stat_key, user_key, value, timestamp=nil, &block)
                                 Reporter.instance.post_value(stat_key, user_key, value, timestamp, block)
                         end
                 end
@@ -168,7 +168,7 @@ module StatHat
                                                                             point[:cb].call(resp)
                                                                     end
                                                             rescue
-                                                                    p $!
+                                                                    puts "Exception in StatHat encoding or callback #{$!.inspect}"
                                                             end
                                                         end
 
@@ -184,7 +184,7 @@ module StatHat
                                                                     end
                                                                 end
                                                         rescue
-                                                                p $!
+                                                                puts "Exception in StatHat encoding or callback #{$!.inspect}"
                                                         end
                                                     end
                                                 end
