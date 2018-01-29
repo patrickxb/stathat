@@ -18,7 +18,7 @@ module StatHat
 
                                 begin
                                         uri.query = URI.encode_www_form(args)
-                                rescue NoMethodError => e
+                                rescue NoMethodError
                                         # backwards compatability for pre 1.9.x
                                         uri.query = args.map { |arg, val| arg.to_s + "=" + CGI::escape(val.to_s) }.join('&')
                                 end
