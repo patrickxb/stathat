@@ -79,14 +79,14 @@ class TestStathat < MiniTest::Unit::TestCase
 
         def assert_success(r)
                 assert(r.valid?, "response was invalid")
-                assert_equal(r.msg, "ok", "message should be 'ok'")
-                assert_equal(r.status, 200, "status should be 200")
+                assert(r.success?, "response should be successful #{r.inspect}")
         end
 
         def assert_failure(r)
                 assert_equal(r.valid?, false, "response was valid")
                 assert_equal(r.msg, "invalid keys", "incorrect error message")
                 assert_equal(r.status, 500, "incorrect status code")
+                refute(r.success?, "response should not be successful #{r.inspect}")
         end
 
         def wait_for_resp

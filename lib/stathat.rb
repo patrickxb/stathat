@@ -23,7 +23,7 @@ module StatHat
                                         uri.query = args.map { |arg, val| arg.to_s + "=" + CGI::escape(val.to_s) }.join('&')
                                 end
 
-                                resp = Net::HTTP.get(uri)
+                                resp = Net::HTTP.get_response(uri)
                                 return Response.new(resp)
                         end
 
@@ -33,7 +33,7 @@ module StatHat
                                                    { :ezkey => ezkey, :data => batch_args }.to_json,
                                                    "Content-Type" => "application/json"
                             end
-                            return Response.new(resp.body)
+                            return Response.new(resp)
                         end
                 end
         end
@@ -221,29 +221,34 @@ module StatHat
         end
 
         class Response
-                def initialize(body)
-                        @body = body
+                def initialize(resp)
+                        @resp = resp
                         @parsed = nil
                 end
 
+                def success?
+                        return valid? && (@resp.body.nil? || msg == "ok")
+                end
+
                 def valid?
-                        return status == 200
+                        return @resp.body.nil? ? @resp.kind_of?(Net::HTTPSuccess) : status == 200
                 end
 
                 def status
                         parse
-                        return @parsed['status']
+                        return @resp.body.nil? ? @resp.status : @parsed['status']
                 end
 
                 def msg
                         parse
-                        return @parsed['msg']
+                        return @resp.body.nil? ? nil : @parsed['msg']
                 end
 
                 private
                 def parse
                         return unless @parsed.nil?
-                        @parsed = JSON.parse(@body)
+                        return if @resp.body.nil?
+                        @parsed = JSON.parse(@resp.body)
                 end
         end
 end
