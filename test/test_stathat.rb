@@ -2,6 +2,11 @@ require 'helper'
 
 
 class TestStathat < MiniTest::Unit::TestCase
+        def setup
+                StatHat::API.pool_size = 1
+                StatHat::API.max_batch = 2
+        end
+
         def test_ez_value
                 r = wait_for_resp do |cb|
                         StatHat::API.ez_post_value("test ez value stat", "test@stathat.com", 0.92, &cb)
@@ -51,9 +56,6 @@ class TestStathat < MiniTest::Unit::TestCase
         end
 
         def test_ez_batch
-                StatHat::API.pool_size = 1
-                StatHat::API.max_batch = 2
-
                 final = wait_for_resp do |cb|
                         StatHat::API.post_count("XXXXXXXX", "YYYYYYYY", 11) do |r|
                                 assert_failure(r)
