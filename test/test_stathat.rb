@@ -55,6 +55,17 @@ class TestStathat < MiniTest::Unit::TestCase
                 assert_failure(r)
         end
 
+        def test_string_value
+            r = wait_for_resp do |cb|
+                    StatHat::API.ez_post_value("ZZZZZZZZ", "YYYYYYYYY", "0.92", &cb)
+            end
+            assert_success(r)
+
+            assert_raises(ArgumentError) do
+                StatHat::API.ez_post_count("XXXXXXXX", "YYYYYYYY", "1.0")
+            end
+        end
+
         def test_ez_batch
                 final = wait_for_resp do |cb|
                         StatHat::API.post_count("XXXXXXXX", "YYYYYYYY", 11) do |r|

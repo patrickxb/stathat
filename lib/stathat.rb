@@ -43,7 +43,7 @@ module StatHat
                         def ez_post_value(stat_name, ezkey, value, timestamp=nil)
                                 args = { :stat => stat_name,
                                         :ezkey => ezkey,
-                                        :value => value }
+                                        :value => Float(value) }
                                 args[:t] = timestamp unless timestamp.nil?
                                 Common::send_to_stathat(Common::EZ_URL, args)
                         end
@@ -51,7 +51,7 @@ module StatHat
                         def ez_post_count(stat_name, ezkey, count, timestamp=nil)
                                 args = { :stat => stat_name,
                                         :ezkey => ezkey,
-                                        :count => count }
+                                        :count => Integer(count) }
                                 args[:t] = timestamp unless timestamp.nil?
                                 Common::send_to_stathat(Common::EZ_URL, args)
                         end
@@ -59,7 +59,7 @@ module StatHat
                         def post_count(stat_key, user_key, count, timestamp=nil)
                                 args = { :key => stat_key,
                                         :ukey => user_key,
-                                        :count => count }
+                                        :count => Integer(count) }
                                 args[:t] = timestamp unless timestamp.nil?
                                 Common::send_to_stathat(Common::CLASSIC_COUNT_URL, args)
                         end
@@ -67,7 +67,7 @@ module StatHat
                         def post_value(stat_key, user_key, value, timestamp=nil)
                                 args = { :key => stat_key,
                                         :ukey => user_key,
-                                        :value => value }
+                                        :value => Float(value) }
                                 args[:t] = timestamp unless timestamp.nil?
                                 Common::send_to_stathat(Common::CLASSIC_VALUE_URL, args)
                         end
@@ -82,19 +82,19 @@ module StatHat
                         attr_accessor :batch_sleep_seconds
 
                         def ez_post_value(stat_name, ezkey, value, timestamp=nil, &block)
-                                Reporter.instance.ez_post_value(stat_name, ezkey, value, timestamp, block)
+                                Reporter.instance.ez_post_value(stat_name, ezkey, Float(value), timestamp, block)
                         end
 
                         def ez_post_count(stat_name, ezkey, count, timestamp=nil, &block)
-                                Reporter.instance.ez_post_count(stat_name, ezkey, count, timestamp, block)
+                                Reporter.instance.ez_post_count(stat_name, ezkey, Integer(count), timestamp, block)
                         end
 
                         def post_count(stat_key, user_key, count, timestamp=nil, &block)
-                                Reporter.instance.post_count(stat_key, user_key, count, timestamp, block)
+                                Reporter.instance.post_count(stat_key, user_key, Integer(count), timestamp, block)
                         end
 
                         def post_value(stat_key, user_key, value, timestamp=nil, &block)
-                                Reporter.instance.post_value(stat_key, user_key, value, timestamp, block)
+                                Reporter.instance.post_value(stat_key, user_key, Float(value), timestamp, block)
                         end
                 end
         end
