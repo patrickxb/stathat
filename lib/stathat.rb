@@ -25,33 +25,25 @@ module StatHat
   class SyncAPI
     class << self
       def ez_post_value(stat_name, ezkey, value, timestamp=nil)
-        args = { :stat => stat_name,
-          :ezkey => ezkey,
-          :value => value }
+        args = { stat: stat_name, ezkey: ezkey, value: value }
         args[:t] = timestamp unless timestamp.nil?
         Common::send_to_stathat(Common::EZ_URL, args)
       end
 
       def ez_post_count(stat_name, ezkey, count, timestamp=nil)
-        args = { :stat => stat_name,
-          :ezkey => ezkey,
-          :count => count }
+        args = { stat: stat_name, ezkey: ezkey, count: count }
         args[:t] = timestamp unless timestamp.nil?
         Common::send_to_stathat(Common::EZ_URL, args)
       end
 
       def post_count(stat_key, user_key, count, timestamp=nil)
-        args = { :key => stat_key,
-          :ukey => user_key,
-          :count => count }
+        args = { key: stat_key, ukey: user_key, count: count }
         args[:t] = timestamp unless timestamp.nil?
         Common::send_to_stathat(Common::CLASSIC_COUNT_URL, args)
       end
 
       def post_value(stat_key, user_key, value, timestamp=nil)
-        args = { :key => stat_key,
-          :ukey => user_key,
-          :value => value }
+        args = { key: stat_key, ukey: user_key, value: value }
         args[:t] = timestamp unless timestamp.nil?
         Common::send_to_stathat(Common::CLASSIC_VALUE_URL, args)
       end
@@ -93,33 +85,25 @@ module StatHat
     end
 
     def post_value(stat_key, user_key, value, timestamp, cb)
-      args = { :key => stat_key,
-        :ukey => user_key,
-        :value => value }
+      args = { key: stat_key, ukey: user_key, value: value }
       args[:t] = timestamp unless timestamp.nil?
       enqueue(Common::CLASSIC_VALUE_URL, args, cb)
     end
 
     def post_count(stat_key, user_key, count, timestamp, cb)
-      args = { :key => stat_key,
-        :ukey => user_key,
-        :count => count }
+      args = { key: stat_key, ukey: user_key, count: count }
       args[:t] = timestamp unless timestamp.nil?
       enqueue(Common::CLASSIC_COUNT_URL, args, cb)
     end
 
     def ez_post_value(stat_name, ezkey, value, timestamp, cb)
-      args = { :stat => stat_name,
-        :ezkey => ezkey,
-        :value => value }
+      args = { stat: stat_name, ezkey: ezkey, value: value }
       args[:t] = timestamp unless timestamp.nil?
       enqueue(Common::EZ_URL, args, cb)
     end
 
     def ez_post_count(stat_name, ezkey, count, timestamp, cb)
-      args = { :stat => stat_name,
-        :ezkey => ezkey,
-        :count => count }
+      args = { stat: stat_name, ezkey: ezkey, count: count }
       args[:t] = timestamp unless timestamp.nil?
       enqueue(Common::EZ_URL, args, cb)
     end
@@ -161,7 +145,7 @@ module StatHat
 
     def enqueue(url, args, cb=nil)
       return false unless @running
-      point = {:url => url, :args => args, :cb => cb}
+      point = { url: url, args: args, cb: cb }
       @que << point
       true
     end
