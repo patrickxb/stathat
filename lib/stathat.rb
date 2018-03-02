@@ -17,7 +17,7 @@ module StatHat
         uri = URI.parse(url)
         uri.query = URI.encode_www_form(args)
         resp = Net::HTTP.get_response(uri)
-        return Response.new(resp.body, resp.code.to_i)
+        Response.new(resp.body, resp.code.to_i)
       end
     end
   end
@@ -174,21 +174,21 @@ module StatHat
     end
 
     def valid?
-      return (200..299).cover? status
+      (200..299).cover? status
     end
 
     def status
       if @body
         parse
-        return @parsed['status']
+        @parsed['status']
       else
-        return @http_status
+        @http_status
       end
     end
 
     def msg
       parse
-      return @parsed['msg']
+      @parsed['msg']
     end
 
     private
