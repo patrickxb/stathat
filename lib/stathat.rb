@@ -15,14 +15,7 @@ module StatHat
     class << self
       def send_to_stathat(url, args)
         uri = URI.parse(url)
-
-        begin
-          uri.query = URI.encode_www_form(args)
-        rescue NoMethodError => e
-          # backwards compatability for pre 1.9.x
-          uri.query = args.map { |arg, val| arg.to_s + "=" + CGI::escape(val.to_s) }.join('&')
-        end
-
+        uri.query = URI.encode_www_form(args)
         resp = Net::HTTP.get_response(uri)
         return Response.new(resp.body, resp.code.to_i)
       end
