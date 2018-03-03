@@ -75,7 +75,6 @@ module StatHat
 
     def initialize
       @que = Queue.new
-      @runlock = Mutex.new
       run_pool
     end
 
@@ -111,12 +110,10 @@ module StatHat
   private
 
     def run_pool
-      @runlock.synchronize { @running = true }
       @pool = []
       5.times do |i|
         @pool[i] = Thread.new do
-          while true do
-            point = @que.pop
+          while point = @que.pop do
             # XXX check for error?
             begin
               resp = Common::send_to_stathat(point[:url], point[:args])
@@ -126,23 +123,21 @@ module StatHat
             rescue
               pp $!
             end
-            @runlock.synchronize do
-              break unless @running
-            end
           end
         end
       end
     end
 
     def stop_pool
-      @runlock.synchronize { @running = false }
+      @que.close
+
       @pool.each do |th|
-        th.join if th && th.alive?
+        th.join
       end
     end
 
     def enqueue(url, args, cb=nil)
-      return false unless @running
+      return false if @que.closed?
       point = { url: url, args: args, cb: cb }
       @que << point
       true
