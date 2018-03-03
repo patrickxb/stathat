@@ -132,8 +132,10 @@ module StatHat
       @que.close
 
       @pool.each do |th|
-        th.join
+        th.join(5)
       end
+
+      puts "WARNING: The StatHat queue was shut down with #{@queue.size} unprocessed tasks" unless 0 == @que.size
     end
 
     def enqueue(url, args, cb=nil)
@@ -176,4 +178,11 @@ module StatHat
       @parsed = JSON.parse(@body)
     end
   end
+end
+
+old_handler = trap("EXIT") do
+  puts "StatHat::Reporter.instance.finish in response to EXIT"
+  StatHat::Reporter.instance.finish
+
+  old_handler.call if old_handler.respond_to?(:call)
 end
