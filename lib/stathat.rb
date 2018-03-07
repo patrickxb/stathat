@@ -13,7 +13,7 @@ module StatHat
                 EZ_URI = URI(EZ_URL)
 
                 class << self
-                        def send_to_stathat(url, args)
+                        def stathat_uri(url, args)
                                 uri = URI.parse(url)
 
                                 begin
@@ -23,6 +23,11 @@ module StatHat
                                         uri.query = args.map { |arg, val| arg.to_s + "=" + CGI::escape(val.to_s) }.join('&')
                                 end
 
+                                return uri
+                        end
+
+                        def send_to_stathat(url, args)
+                                uri = stathat_uri(url, args)
                                 resp = Net::HTTP.get_response(uri)
                                 return Response.new(resp)
                         end
@@ -36,6 +41,32 @@ module StatHat
                             return Response.new(resp)
                         end
                 end
+        end
+
+        class Export
+            class Error < StandardError
+                attr_reader :response
+
+                def initialize(msg, response)
+                    @response = response
+                    super(msg)
+                end
+            end
+
+            EXPORT_URL = "https://www.stathat.com/x"
+
+            class << self
+                    def get(access_token, paths, args)
+                        uri = Common::stathat_uri(([EXPORT_URL, access_token] + paths).join('/'), args)
+                        resp = Net::HTTP.get_response(uri)
+
+                        if resp.kind_of?(Net::HTTPSuccess) && resp.body
+                            return JSON.parse(resp.body)
+                        else
+                            raise Error.new("export error #{resp.inspect} for #{uri.inspect}", resp)
+                        end
+                    end
+            end
         end
 
         class SyncAPI
